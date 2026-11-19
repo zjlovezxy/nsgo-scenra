@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/nsgo-dev/nsgo/core"
+	agio "github.com/oneo-me/nsgo-agio"
 	"github.com/oneo-me/nsgo-agio/agent"
 	"github.com/oneo-me/nsgo-agio/chatview"
 	"github.com/oneo-me/nsgo-agio/host"
@@ -53,9 +54,11 @@ func lines(s string) []string {
 
 // startAgents runs the coding agents for the window's scope, offering
 // each the scenra skill and the server telling what the user sees, and
-// keeps the agents and models turned off in the storage. opts.Drivers,
-// when set, stands for the agent CLIs, as in tests.
-func startAgents(cx *core.Scope, opts host.Options) (*chatview.Model, *scenraview.Server) {
+// keeps the agents and models turned off in the storage; while sess runs
+// them on another machine, the backend it reached drives them instead, and
+// no server of this one tells them anything. opts.Drivers, when set,
+// stands for the agent CLIs, as in tests.
+func startAgents(cx *core.Scope, opts host.Options, sess *session) (*chatview.Model, *scenraview.Server) {
 	st := cx.Storage()
 	disabled, _ := st.GetItem(keyDisabled)
 	models, _ := st.GetItem(keyDisabledModels)
@@ -63,6 +66,14 @@ func startAgents(cx *core.Scope, opts host.Options) (*chatview.Model, *scenravie
 		opts.Disabled = append(opts.Disabled, agent.Tool(t))
 	}
 	opts.DisabledModels = lines(models)
+	// Another machine's agents edit the copy of the folder it serves, and
+	// take the skills it has there.
+	if remote := sess.backend(); remote != nil {
+		m := chatview.Bind(cx, remote)
+		m.Do(func(b agio.Backend) error { b.Discover(); return nil }, nil)
+		keepDisabled(cx, m)
+		return m, nil
+	}
 	opts.Skills = append(opts.Skills, skillDirs()...)
 	srv, err := scenraview.Listen()
 	if err == nil {
@@ -76,6 +87,14 @@ func startAgents(cx *core.Scope, opts host.Options) (*chatview.Model, *scenravie
 		}
 	})
 	m := chatview.Bind(cx, h)
+	keepDisabled(cx, m)
+	return m, srv
+}
+
+// keepDisabled keeps the agents and models turned off in the storage, as
+// the backend's state shows them.
+func keepDisabled(cx *core.Scope, m *chatview.Model) {
+	st := cx.Storage()
 	cx.Effect(func() {
 		var tools, keys []string
 		for _, t := range m.State().Tools {
@@ -92,5 +111,4 @@ func startAgents(cx *core.Scope, opts host.Options) (*chatview.Model, *scenravie
 			return true
 		})
 	})
-	return m, srv
 }

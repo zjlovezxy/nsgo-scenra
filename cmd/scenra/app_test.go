@@ -34,7 +34,7 @@ func (fake) History(string, string) ([]agent.Event, error) { return nil, nil }
 func testRoot(t *testing.T) func(cx *core.Scope) core.Node {
 	home := t.TempDir()
 	return func(cx *core.Scope) core.Node {
-		return root(cx, host.Options{Env: []string{}, Home: home, Tools: []agent.Tool{agent.Claude}, Drivers: map[agent.Tool]agent.Driver{agent.Claude: fake{}}})
+		return root(cx, host.Options{Env: []string{}, Home: home, Tools: []agent.Tool{agent.Claude}, Drivers: map[agent.Tool]agent.Driver{agent.Claude: fake{}}}, newSession(cx))
 	}
 }
 

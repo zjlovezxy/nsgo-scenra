@@ -33,3 +33,21 @@ namingFailed: "命名失败：{error}"
 statsSection: 统计
 statsSend: 发送使用统计
 statsDetail: 发送应用的使用次数和时长，不含流程图、消息或个人信息，帮助改进 Scenra。
+remoteSection: 智能体所在机器
+remoteDetail: 用 `scenra serve` 在另一台机器上提供该文件夹，经 ssh 连接，由服务器或另一台电脑运行对话的智能体，这个窗口只负责显示。
+remoteOn: 在另一台机器上运行智能体
+remoteSSH: SSH 主机
+remoteSSHPlaceholder: ssh 配置里的主机名，留空则直接连接
+remoteAddr: 服务地址
+remoteToken: Token
+remoteTokenPlaceholder: serve 打印的 token
+remoteLocal: 正在本机运行。
+remoteConnecting: 正在连接…
+remoteConnected: 已连接，对话的智能体在另一台机器上运行。
+remoteFailed:
+  message: "{error}"
+  description: 连接另一台机器失败的原因，由 ssh 或对端服务给出；error 是那条消息。
+remoteStopped: 另一台机器不再提供智能体。
+remoteReconnect: 重新连接
+remoteServe: 在文件夹所在的机器上运行这条命令，然后连接。
+remoteCopy: 复制命令

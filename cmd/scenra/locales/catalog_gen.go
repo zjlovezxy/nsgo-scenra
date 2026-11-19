@@ -44,6 +44,7 @@ func For(cx *core.Scope) Messages {
 // (tsx.RegisterMessages).
 var Parameters = map[string][]string{
 	"NamingFailed": {"error_"},
+	"RemoteFailed": {"error_"},
 }
 
 // Translation is a language's messages another package supplies:
@@ -53,6 +54,7 @@ var Parameters = map[string][]string{
 type Translation struct {
 	Texts        map[string]string
 	NamingFailed func(error_ string) string
+	RemoteFailed func(error_ string) string
 }
 
 var supplied = map[string]Translation{}
@@ -93,6 +95,21 @@ const (
 	textStatsSection
 	textStatsSend
 	textStatsDetail
+	textRemoteSection
+	textRemoteDetail
+	textRemoteOn
+	textRemoteSSH
+	textRemoteSSHPlaceholder
+	textRemoteAddr
+	textRemoteToken
+	textRemoteTokenPlaceholder
+	textRemoteLocal
+	textRemoteConnecting
+	textRemoteConnected
+	textRemoteStopped
+	textRemoteReconnect
+	textRemoteServe
+	textRemoteCopy
 	numTexts
 )
 
@@ -133,6 +150,21 @@ var keyOfText = [numTexts]string{
 	"statsSection",
 	"statsSend",
 	"statsDetail",
+	"remoteSection",
+	"remoteDetail",
+	"remoteOn",
+	"remoteSSH",
+	"remoteSSHPlaceholder",
+	"remoteAddr",
+	"remoteToken",
+	"remoteTokenPlaceholder",
+	"remoteLocal",
+	"remoteConnecting",
+	"remoteConnected",
+	"remoteStopped",
+	"remoteReconnect",
+	"remoteServe",
+	"remoteCopy",
 }
 
 // textsEn are the messages without arguments in en.
@@ -170,7 +202,22 @@ var textsEn = i18n.NewTexts(""+
 	"Max"+
 	"Statistics"+
 	"Send usage statistics"+
-	"Sends how often and how long the app is used, with no charts, messages or personal data, to help improve Scenra.",
+	"Sends how often and how long the app is used, with no charts, messages or personal data, to help improve Scenra."+
+	"Agent machine"+
+	"Runs the conversations' agents on another machine serving the folder with `scenra serve`, over ssh, so a server or a laptop does the work while this window draws."+
+	"Run the agents on another machine"+
+	"SSH host"+
+	"A host of your ssh config, empty to connect directly"+
+	"Server address"+
+	"Token"+
+	"The token that serve printed"+
+	"Running on this machine."+
+	"Connecting…"+
+	"Connected; the conversations run their agents on the other machine."+
+	"The other machine stopped serving the agents."+
+	"Reconnect"+
+	"Run this where the folder is, then connect."+
+	"Copy Command",
 	[]uint16{
 		6,
 		4,
@@ -206,6 +253,21 @@ var textsEn = i18n.NewTexts(""+
 		10,
 		21,
 		112,
+		13,
+		162,
+		33,
+		8,
+		52,
+		14,
+		5,
+		28,
+		24,
+		13,
+		67,
+		45,
+		9,
+		43,
+		12,
 	})
 
 // textsZhHans are the messages without arguments in zh-Hans.
@@ -243,7 +305,22 @@ var textsZhHans = i18n.NewTexts(""+
 	"最高"+
 	"统计"+
 	"发送使用统计"+
-	"发送应用的使用次数和时长，不含流程图、消息或个人信息，帮助改进 Scenra。",
+	"发送应用的使用次数和时长，不含流程图、消息或个人信息，帮助改进 Scenra。"+
+	"智能体所在机器"+
+	"用 `scenra serve` 在另一台机器上提供该文件夹，经 ssh 连接，由服务器或另一台电脑运行对话的智能体，这个窗口只负责显示。"+
+	"在另一台机器上运行智能体"+
+	"SSH 主机"+
+	"ssh 配置里的主机名，留空则直接连接"+
+	"服务地址"+
+	"Token"+
+	"serve 打印的 token"+
+	"正在本机运行。"+
+	"正在连接…"+
+	"已连接，对话的智能体在另一台机器上运行。"+
+	"另一台机器不再提供智能体。"+
+	"重新连接"+
+	"在文件夹所在的机器上运行这条命令，然后连接。"+
+	"复制命令",
 	[]uint16{
 		6,
 		6,
@@ -279,6 +356,21 @@ var textsZhHans = i18n.NewTexts(""+
 		6,
 		18,
 		103,
+		21,
+		165,
+		36,
+		10,
+		49,
+		12,
+		5,
+		21,
+		21,
+		15,
+		60,
+		39,
+		12,
+		66,
+		12,
 	})
 
 // texts returns the messages without arguments in lang, nil for a
@@ -337,6 +429,9 @@ func Supply(lang string, t Translation) {
 	s := supplied[lang]
 	if t.NamingFailed != nil {
 		s.NamingFailed = t.NamingFailed
+	}
+	if t.RemoteFailed != nil {
+		s.RemoteFailed = t.RemoteFailed
 	}
 	supplied[lang] = s
 	Catalog.Add(lang)
@@ -618,3 +713,132 @@ func StatsDetail(cx *core.Scope) string { return For(cx).StatsDetail() }
 
 // StatsDetail is the package's StatsDetail in the language of msgs.
 func (msgs Messages) StatsDetail() string { return msgs.text(textStatsDetail) }
+
+// RemoteSection says "Agent machine"
+// in the language the app shows under cx.
+func RemoteSection(cx *core.Scope) string { return For(cx).RemoteSection() }
+
+// RemoteSection is the package's RemoteSection in the language of msgs.
+func (msgs Messages) RemoteSection() string { return msgs.text(textRemoteSection) }
+
+// RemoteDetail says "Runs the conversations' agents on another machine serving the folder with `scenra serve`, over ssh, so a server or a laptop does the work while this window draws."
+// in the language the app shows under cx.
+func RemoteDetail(cx *core.Scope) string { return For(cx).RemoteDetail() }
+
+// RemoteDetail is the package's RemoteDetail in the language of msgs.
+func (msgs Messages) RemoteDetail() string { return msgs.text(textRemoteDetail) }
+
+// RemoteOn says "Run the agents on another machine"
+// in the language the app shows under cx.
+func RemoteOn(cx *core.Scope) string { return For(cx).RemoteOn() }
+
+// RemoteOn is the package's RemoteOn in the language of msgs.
+func (msgs Messages) RemoteOn() string { return msgs.text(textRemoteOn) }
+
+// RemoteSSH says "SSH host"
+// in the language the app shows under cx.
+func RemoteSSH(cx *core.Scope) string { return For(cx).RemoteSSH() }
+
+// RemoteSSH is the package's RemoteSSH in the language of msgs.
+func (msgs Messages) RemoteSSH() string { return msgs.text(textRemoteSSH) }
+
+// RemoteSSHPlaceholder says "A host of your ssh config, empty to connect directly"
+// in the language the app shows under cx.
+func RemoteSSHPlaceholder(cx *core.Scope) string { return For(cx).RemoteSSHPlaceholder() }
+
+// RemoteSSHPlaceholder is the package's RemoteSSHPlaceholder in the language of msgs.
+func (msgs Messages) RemoteSSHPlaceholder() string { return msgs.text(textRemoteSSHPlaceholder) }
+
+// RemoteAddr says "Server address"
+// in the language the app shows under cx.
+func RemoteAddr(cx *core.Scope) string { return For(cx).RemoteAddr() }
+
+// RemoteAddr is the package's RemoteAddr in the language of msgs.
+func (msgs Messages) RemoteAddr() string { return msgs.text(textRemoteAddr) }
+
+// RemoteToken says "Token"
+// in the language the app shows under cx.
+func RemoteToken(cx *core.Scope) string { return For(cx).RemoteToken() }
+
+// RemoteToken is the package's RemoteToken in the language of msgs.
+func (msgs Messages) RemoteToken() string { return msgs.text(textRemoteToken) }
+
+// RemoteTokenPlaceholder says "The token that serve printed"
+// in the language the app shows under cx.
+func RemoteTokenPlaceholder(cx *core.Scope) string { return For(cx).RemoteTokenPlaceholder() }
+
+// RemoteTokenPlaceholder is the package's RemoteTokenPlaceholder in the language of msgs.
+func (msgs Messages) RemoteTokenPlaceholder() string { return msgs.text(textRemoteTokenPlaceholder) }
+
+// RemoteLocal says "Running on this machine."
+// in the language the app shows under cx.
+func RemoteLocal(cx *core.Scope) string { return For(cx).RemoteLocal() }
+
+// RemoteLocal is the package's RemoteLocal in the language of msgs.
+func (msgs Messages) RemoteLocal() string { return msgs.text(textRemoteLocal) }
+
+// RemoteConnecting says "Connecting…"
+// in the language the app shows under cx.
+func RemoteConnecting(cx *core.Scope) string { return For(cx).RemoteConnecting() }
+
+// RemoteConnecting is the package's RemoteConnecting in the language of msgs.
+func (msgs Messages) RemoteConnecting() string { return msgs.text(textRemoteConnecting) }
+
+// RemoteConnected says "Connected; the conversations run their agents on the other machine."
+// in the language the app shows under cx.
+func RemoteConnected(cx *core.Scope) string { return For(cx).RemoteConnected() }
+
+// RemoteConnected is the package's RemoteConnected in the language of msgs.
+func (msgs Messages) RemoteConnected() string { return msgs.text(textRemoteConnected) }
+
+// RemoteFailed says "{error}"
+// in the language the app shows under cx.
+//
+// Why connecting to the other machine failed, as ssh or the server said it.
+func RemoteFailed(cx *core.Scope, error_ string) string { return For(cx).RemoteFailed(error_) }
+
+// RemoteFailed is the package's RemoteFailed in the language of msgs.
+func (msgs Messages) RemoteFailed(error_ string) string {
+	if i18n.IsPseudo(msgs.lang) {
+		return i18n.Pseudo(msgs.lang, Messages{lang: Source, mark: true}.RemoteFailed(error_))
+	}
+	for lang := msgs.lang; ; lang = i18n.Parent(lang) {
+		if f := supplied[lang].RemoteFailed; f != nil {
+			return f(error_)
+		}
+		switch lang {
+		case "", "en":
+			return msgs.arg(error_)
+		case "zh-Hans":
+			return error_
+		}
+	}
+}
+
+// RemoteStopped says "The other machine stopped serving the agents."
+// in the language the app shows under cx.
+func RemoteStopped(cx *core.Scope) string { return For(cx).RemoteStopped() }
+
+// RemoteStopped is the package's RemoteStopped in the language of msgs.
+func (msgs Messages) RemoteStopped() string { return msgs.text(textRemoteStopped) }
+
+// RemoteReconnect says "Reconnect"
+// in the language the app shows under cx.
+func RemoteReconnect(cx *core.Scope) string { return For(cx).RemoteReconnect() }
+
+// RemoteReconnect is the package's RemoteReconnect in the language of msgs.
+func (msgs Messages) RemoteReconnect() string { return msgs.text(textRemoteReconnect) }
+
+// RemoteServe says "Run this where the folder is, then connect."
+// in the language the app shows under cx.
+func RemoteServe(cx *core.Scope) string { return For(cx).RemoteServe() }
+
+// RemoteServe is the package's RemoteServe in the language of msgs.
+func (msgs Messages) RemoteServe() string { return msgs.text(textRemoteServe) }
+
+// RemoteCopy says "Copy Command"
+// in the language the app shows under cx.
+func RemoteCopy(cx *core.Scope) string { return For(cx).RemoteCopy() }
+
+// RemoteCopy is the package's RemoteCopy in the language of msgs.
+func (msgs Messages) RemoteCopy() string { return msgs.text(textRemoteCopy) }

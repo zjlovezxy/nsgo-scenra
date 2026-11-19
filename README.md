@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/oneo-me"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-oneo--me-181717?logo=github&logoColor=white"></a>
+  <a href="https://github.com/zjlovezxy/nsgo-scenra"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-zjlovezxy%2Fnsgo--scenra-181717?logo=github&logoColor=white"></a>
   <a href="https://oneo.me"><img alt="Blog" src="https://img.shields.io/badge/Blog-oneo.me-0969da"></a>
   <a href="https://x.com/oneo666"><img alt="X" src="https://img.shields.io/badge/X-%40oneo666-000000?logo=x&logoColor=white"></a>
   <a href="https://github.com/sponsors/oneo-me"><img alt="GitHub Sponsors" src="https://img.shields.io/badge/GitHub%20Sponsors-ea4aaa?logo=githubsponsors&logoColor=white"></a>
@@ -37,6 +37,8 @@ Scenra is a coined word: *scene*, the screens an app is made of, joined by *-ra*
 - The assistant is a coding agent you have installed, such as Claude Code, Codex, pi or CodeBuddy Code: it asks what it needs, then writes and makes the folder's files as the Scenra skill teaches, and each redraws as it writes.
 - Designs play as the app would: pressing an element opens another screen, closes the one shown or switches tabs, and a tab bar marks the screen shown. A screen can fill a window's content area, so playing the window swaps only its content and its sidebar stays.
 - Resting the pointer on an element shows its comment and note: a comment asks the assistant for a change, and a note records what the design cannot show.
+- The folder's agents can run on another machine — a server or a laptop — over `ssh`, so the window only draws while that machine runs the conversations and works on its copy of the folder.
+- Each folder keeps the agent and model its new conversations start with, so a folder designed for a fast model and another for a careful one need not be reset each time.
 - The assistant works on what you select, resolves your comments, keeps the notes true, and works in the open folder, so it can chart how the code there works.
 - Sending a message saves your changes; while the assistant works the files stay as it leaves them, and each of its turns undoes as one step.
 - Pieces screens share, such as a tab bar, are components in the folder's `components/`, which designs draw with `use`, so changing one changes every screen; as with Figma's instances, a use can pick the component's variants, change the texts, icons, styles and taps of the elements its component names, and fill the slots it leaves with elements of its own, components inside included. **Components** atop the list shows them all together, grouped by their names as files are, small ones scaled up to stay legible.
@@ -46,17 +48,19 @@ Scenra is a coined word: *scene*, the screens an app is made of, joined by *-ra*
 
 ## Install
 
-Download the macOS, Windows or Linux installer from the [latest release](https://github.com/oneo-me/nsgo-scenra/releases/latest), or install from a terminal:
+Download the macOS, Windows or Linux installer from the [latest release](https://github.com/zjlovezxy/nsgo-scenra/releases/latest), or install from a terminal:
 
 ```sh
-curl -fsSL https://github.com/oneo-me/nsgo-scenra/releases/latest/download/install.sh | sh    # macOS and Linux
+curl -fsSL https://github.com/zjlovezxy/nsgo-scenra/releases/latest/download/install.sh | sh    # macOS and Linux
 ```
 
 ```powershell
 irm https://github.com/oneo-me/nsgo-scenra/releases/latest/download/install.ps1 | iex         # Windows
 ```
 
-Scenra checks for updates daily and from **Check for Updates…** in its menu; on Linux it updates the Debian package.
+This fork builds macOS arm64, Windows and Linux from [GitHub Actions](.github/workflows/release.yml); macOS builds need an Apple Silicon Mac and are not notarized, so open one with a right click → **Open** the first time.
+
+These builds do not update themselves: download the latest release to update. Upstream's releases, which Scenra checks for daily, are signed and do.
 
 ## Run
 
@@ -78,6 +82,16 @@ On macOS, `.scenra` files open with the app from the Finder; on Windows and Linu
 5. Start another conversation with ⌘N; new conversations keep the agent, model and settings chosen last.
 
 The [`flowfile` package comment](flowfile/) describes the file format.
+
+## Run the agents on another machine
+
+A folder's agents can run elsewhere, over `ssh`, so a server does the work while the window only draws:
+
+1. On the machine holding the folder, run `scenra serve -dir path/to/folder`; it prints the address it listens on and a token.
+2. Under **Settings** (⌘,) → **Agent machine**, turn on **Run the agents on another machine** and give it the host of your `ssh` config, that address (empty for `127.0.0.1:7788`) and the token.
+3. The conversations then run there; they edit that machine's copy of the folder, so keep it in step over git or a shared mount. The command **serve** prints runs the server on a machine without the app, with the same binary.
+
+That machine needs the binary and the agents installed, and its `sshd` must allow TCP forwarding (`AllowTcpForwarding yes`). Leave the host empty to dial the address directly, as for a server reached another way.
 
 ## Usage statistics
 
