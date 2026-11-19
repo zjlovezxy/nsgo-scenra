@@ -49,6 +49,9 @@ type Options struct {
 	Folder string
 	// OnSend, when set, hears of each message sent to the assistant.
 	OnSend func()
+	// NoView, when set, says the agents run elsewhere and cannot ask the
+	// Server what the user sees, so their instructions don't tell them to.
+	NoView bool
 }
 
 // document is the Scenra file shown: its content and path, its history

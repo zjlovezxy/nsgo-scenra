@@ -41,3 +41,21 @@ namingFailed:
 statsSection: Statistics
 statsSend: Send usage statistics
 statsDetail: Sends how often and how long the app is used, with no charts, messages or personal data, to help improve Scenra.
+remoteSection: Agent machine
+remoteDetail: Runs the conversations' agents on another machine serving the folder with `scenra serve`, over ssh, so a server or a laptop does the work while this window draws.
+remoteOn: Run the agents on another machine
+remoteSSH: SSH host
+remoteSSHPlaceholder: A host of your ssh config, empty to connect directly
+remoteAddr: Server address
+remoteToken: Token
+remoteTokenPlaceholder: The token that serve printed
+remoteLocal: Running on this machine.
+remoteConnecting: Connecting…
+remoteConnected: Connected; the conversations run their agents on the other machine.
+remoteFailed:
+  message: "{error}"
+  description: Why connecting to the other machine failed, as ssh or the server said it.
+remoteStopped: The other machine stopped serving the agents.
+remoteReconnect: Reconnect
+remoteServe: Run this where the folder is, then connect.
+remoteCopy: Copy Command

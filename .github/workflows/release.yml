@@ -4,12 +4,17 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to build and release, such as 0.2.0; the tag v followed by it must not exist yet
+        required: true
 
 permissions:
   contents: write
 
 concurrency:
-  group: release-${{ github.ref_name }}
+  group: release-${{ github.event.inputs.version || github.ref_name }}
 
 jobs:
   release:
@@ -20,9 +25,18 @@ jobs:
       - name: Check out
         uses: actions/checkout@v5
 
+      - name: Read the version
+        id: version
+        run: |
+          version="${{ github.event.inputs.version }}"
+          version="${version#v}"
+          if [ -z "$version" ]; then version="${GITHUB_REF_NAME#v}"; fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+
       - name: Extract release notes
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          version="${{ steps.version.outputs.version }}"
           awk -v heading="## [$version]" '
             index($0, heading) == 1 { found = 1; next }
             found && /^## / { exit }
@@ -36,19 +50,21 @@ jobs:
           go-version-file: go.mod
 
       - name: Install NSIS
-        run: brew install makensis
+        run: brew install makensis || true
 
       - name: Build
         env:
-          # Signs the installers and appcasts the installed apps update from.
+          # Signs the installers and appcasts the installed apps update from;
+          # without it the builds update themselves from their release page
+          # alone, so a fork may leave the secret unset.
           NSGO_UPDATES_KEY: ${{ secrets.NSGO_UPDATES_KEY }}
-        run: |
-          test -n "$NSGO_UPDATES_KEY" || { echo "The NSGO_UPDATES_KEY secret is missing"; exit 1; }
-          go tool nsgo build -version "${GITHUB_REF_NAME#v}" cmd/scenra
+        run: go tool nsgo build -version "${{ steps.version.outputs.version }}" cmd/scenra
 
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          gh release create "$GITHUB_REF_NAME" --title "${GITHUB_REF_NAME#v}" --notes-file "$RUNNER_TEMP/notes.md" \
+          gh release create "$TAG" --target "$GITHUB_SHA" --title "$VERSION" --notes-file "$RUNNER_TEMP/notes.md" \
             $(find cmd/scenra/dist/releases -maxdepth 1 -type f)

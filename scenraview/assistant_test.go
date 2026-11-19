@@ -270,7 +270,7 @@ func TestConversationsResumeWithTheFolder(t *testing.T) {
 	})
 }
 
-func TestNewConversationsStartWithTheChoiceMadeLast(t *testing.T) {
+func TestNewConversationsStartWithTheChoiceMadeLastInTheirFolder(t *testing.T) {
 	app, e, d := startAssistant(t)
 	dir := t.TempDir()
 	openPath(t, app, e, dir)
@@ -291,12 +291,27 @@ func TestNewConversationsStartWithTheChoiceMadeLast(t *testing.T) {
 	if c := shown(e.a); c.Model != model || c.Effort != effort {
 		t.Fatalf("the new conversation chose %q %q", c.Model, c.Effort)
 	}
-	stored, _ := app.Storage().GetItem("editor.choice")
+	// The choice is the folder's own.
+	key := "editor.choice." + folderID(dir)
+	stored, _ := app.Storage().GetItem(key)
+	if stored == "" {
+		t.Fatalf("the folder kept no choice under %s", key)
+	}
+	if other, _ := app.Storage().GetItem("editor.choice"); other != "" {
+		t.Fatalf("the choice leaked to every folder: %s", other)
+	}
 
-	// Another start remembers it.
-	again, e2, _ := startAssistant(t, nsgotest.Storage(map[string]string{"editor.choice": stored}))
-	openPath(t, again, e2, t.TempDir())
+	// Another start remembers it while it opens that folder, and another
+	// folder starts with the model it had.
+	again, e2, _ := startAssistant(t, nsgotest.Storage(map[string]string{key: stored}))
+	openPath(t, again, e2, dir)
 	again.WaitUntil(5*time.Second, func() bool { c := shown(e2.a); return c != nil && c.Model == model && c.Effort == effort })
+	other := t.TempDir()
+	openPath(t, again, e2, other)
+	again.WaitUntil(5*time.Second, func() bool {
+		c := shown(e2.a)
+		return c != nil && c.Dir == other && c.Model != model
+	})
 }
 
 func TestAScreenShowsOverTheComponentsMadeWithIt(t *testing.T) {

@@ -30,6 +30,11 @@ import (
 
 func main() {
 	agent.Client = agent.ClientInfo{Name: "scenra", Title: "Scenra", Version: "1"}
+	// `scenra serve` runs the agents of a folder for a window elsewhere,
+	// without a window of its own.
+	if len(os.Args) > 1 && os.Args[1] == "serve" {
+		os.Exit(serve(os.Args[2:]))
+	}
 	nsgo.Run(Root, append([]nsgo.Option{nsgo.WindowSize(1440, 900), nsgo.WindowConstraints(core.WindowConstraints{MinWidth: 1000, MinHeight: 480})},
 		demoOptions()...)...)
 }
@@ -39,15 +44,36 @@ var shown *tabs
 
 // Root is the app's window: its tabs in its title bar, the home page
 // first, over the one shown, and the name of its file in the title.
+// Connecting to another machine's agents and back builds it again, for the
+// tabs the storage kept open.
 func Root(cx *core.Scope) core.Node {
 	home, _ := os.UserHomeDir()
-	return root(cx, host.Options{Dir: home})
+	sess := newSession(cx)
+	cx.Cleanup(sess.close)
+	return core.Dynamic(func(cx *core.Scope) core.Node {
+		sess.rev.Get()
+		return root(cx, host.Options{Dir: home}, sess)
+	})
 }
 
-// root is Root with the agents agents runs.
-func root(cx *core.Scope, agents host.Options) core.Node {
+// root is Root with the agents agents runs and the machine sess says they
+// start on.
+func root(cx *core.Scope, agents host.Options, sess *session) core.Node {
 	rememberLanguage(cx)
 	toasts := ui.NewToaster(cx)
+	// What connecting to another machine's agents failed with shows, once
+	// per message.
+	failed := ""
+	cx.Effect(func() {
+		p := sess.problem.Get()
+		if p == "" || p == failed {
+			return
+		}
+		failed = p
+		cx.Untrack(func() {
+			toasts.Show(ui.ToastContent{Type: ui.ToastError, Title: locales.For(cx).RemoteFailed(p)})
+		})
+	})
 	page := core.NewSignal(cx, pageRecent)
 	stats := newUsage(cx)
 	var m *chatview.Model
@@ -55,9 +81,15 @@ func root(cx *core.Scope, agents host.Options) core.Node {
 	if demoBuild {
 		m = demoAgents(cx)
 	} else {
-		m, srv = startAgents(cx, agents)
+		m, srv = startAgents(cx, agents, sess)
 	}
 	namer := newNamer(cx, m)
+	// Agents elsewhere cannot reach this window's server, so their
+	// instructions don't tell them to ask it what the user sees.
+	remote := sess.backend() != nil
+	if remote {
+		srv = nil
+	}
 	var t *tabs
 	// The menu's Settings shows the home page's.
 	settings := func() {
@@ -75,6 +107,7 @@ func root(cx *core.Scope, agents host.Options) core.Node {
 			Remember: "editor",
 			OnSend:   stats.sent,
 			Folder:   dir,
+			NoView:   remote,
 		})
 		if srv != nil {
 			srv.Attach(e)
@@ -153,7 +186,7 @@ func root(cx *core.Scope, agents host.Options) core.Node {
 			return core.View{Style: ui.FillRest, StyleFunc: ui.Filled(colors.Background), Children: []core.Node{
 				tabBar(cx, t, titleBar),
 				core.View{Style: ui.FillRest, Children: []core.Node{
-					layer(func() bool { return t.shown.Get() == nil }, homePage(cx, t, page, m, namer)),
+					layer(func() bool { return t.shown.Get() == nil }, homePage(cx, t, page, m, namer, sess)),
 					core.Each(t.open.Get, func(tb *tab) *tab { return tb }, func(cx *core.Scope, item func() *tab, _ func() int) core.Node {
 						tb := item()
 						return layer(func() bool { return t.shown.Get() == tb }, scenraview.Window{Editor: tb.e, NoHeader: true})

@@ -16,9 +16,10 @@ func statsSwitch(cx *core.Scope) core.Node {
 }
 
 // settingsPage, a page of the home page, chooses the language, turns the
-// agents and their models on or off, sets the model titling
-// conversations, and turns the usage statistics on or off.
-func settingsPage(cx *core.Scope, m *chatview.Model, n *namer) core.Node {
+// agents and their models on or off, says which machine runs them, sets
+// the model titling conversations, and turns the usage statistics on or
+// off.
+func settingsPage(cx *core.Scope, m *chatview.Model, n *namer, s *session) core.Node {
 	tr := locales.For(cx)
 	colors := ui.ColorsOf(cx)
 	return ui.ScrollView{Style: ui.FillRest, ContentStyle: core.Style{AlignItems: core.AlignCenter}, Children: []core.Node{
@@ -27,6 +28,7 @@ func settingsPage(cx *core.Scope, m *chatview.Model, n *namer) core.Node {
 			ui.Text(tr.SettingsTitle(), 20, ui.Semibold, colors.Text),
 			languageSection(cx),
 			chatview.Agents{Model: m},
+			remoteSection(cx, s),
 			namingSection(cx, n),
 			core.View{Style: core.Style{Gap: 4}, Children: []core.Node{
 				ui.Text(tr.StatsSection(), 15, ui.Semibold, colors.Text),

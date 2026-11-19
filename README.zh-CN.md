@@ -37,6 +37,8 @@ Scenra 是一个自造词：*scene*（场景）指构成应用的一个个界面
 - 助手是你已安装的编程 agent，如 Claude Code、Codex、pi 或 CodeBuddy Code：它先问清需要的信息，再按 Scenra 技能的说明编写和新建文件夹中的文件，每个文件边写边重新绘制。
 - 设计可以像应用一样点着用：点击元素会打开另一个界面、关闭当前界面或切换标签页，标签栏会标出当前所在的界面。界面可以填进窗口的内容区，点着用窗口时只替换内容区，侧边栏一直都在。
 - 指针在元素上停留一会就会显示它的评论和备注：评论请助手修改，备注记下设计图表达不了的内容。
+- 文件夹中的智能体可以经 `ssh` 跑在另一台机器上，比如一台服务器或另一台电脑：窗口只负责显示，由那台机器运行对话，并在它那份文件夹上工作。
+- 每个文件夹记住它的新对话所使用的智能体和模型，为快速模型设计的文件夹和需要仔细推理的文件夹不必每次重设。
 - 助手基于你选中的内容工作，处理你的评论、让备注与设计保持一致，并在打开的文件夹中工作，因此能画出那里的代码如何运作。
 - 发送消息会保存你的修改；助手工作期间文件保持它写下的样子，它的每一轮修改可作为一步撤销。
 - 多个界面共用的部分（如标签栏）是文件夹中 `components/` 下的组件，设计用 `use` 绘制它们，改一处即改所有界面；像 Figma 的实例一样，引用处可以选用组件的变体，替换组件中命名元素的文字、图标、样式和点按，并用自己的元素（包括其他组件）填充组件留出的插槽。它们不在列表中列出，而由列表上方的**组件**集中在一个画布上展示，像文件一样按名称分组，较小的组件会放大以便看清。
@@ -46,17 +48,19 @@ Scenra 是一个自造词：*scene*（场景）指构成应用的一个个界面
 
 ## 安装
 
-从[最新版本](https://github.com/oneo-me/nsgo-scenra/releases/latest)下载 macOS、Windows 或 Linux 的安装包，或在终端中安装：
+从[最新版本](https://github.com/zjlovezxy/nsgo-scenra/releases/latest)下载 macOS、Windows 或 Linux 的安装包，或在终端中安装：
 
 ```sh
-curl -fsSL https://github.com/oneo-me/nsgo-scenra/releases/latest/download/install.sh | sh    # macOS and Linux
+curl -fsSL https://github.com/zjlovezxy/nsgo-scenra/releases/latest/download/install.sh | sh    # macOS and Linux
 ```
 
 ```powershell
-irm https://github.com/oneo-me/nsgo-scenra/releases/latest/download/install.ps1 | iex         # Windows
+irm https://github.com/zjlovezxy/nsgo-scenra/releases/latest/download/install.ps1 | iex         # Windows
 ```
 
-Scenra 每天检查一次更新，也可从菜单中的**检查更新…**手动检查；在 Linux 上会更新 Debian 包。
+此分支由 [GitHub Actions](.github/workflows/release.yml) 构建 macOS arm64、Windows 和 Linux 版本；macOS 版需要 Apple 芯片的 Mac，且未经公证，第一次打开请右键 → **打开**。
+
+这些构建不会自动更新，请下载最新版本手动更新；上游发布的版本每天检查一次更新。
 
 ## 运行
 
@@ -78,6 +82,16 @@ go tool nsgo build cmd/scenra   # build macOS, Windows and Linux into cmd/scenra
 5. 按 ⌘N 开始新对话；新对话沿用上次选择的 agent、模型及其设置。
 
 文件格式见 [`flowfile` 包注释](flowfile/)。
+
+## 在另一台机器上运行智能体
+
+文件夹的智能体可以经 `ssh` 跑在别处，由服务器干活，窗口只负责显示：
+
+1. 在放着该文件夹的机器上运行 `scenra serve -dir 文件夹路径`，它会打印监听的地址和一个 token。
+2. 在**设置**（⌘,）的**智能体所在机器**中打开**在另一台机器上运行智能体**，填入 `ssh` 配置中的主机名、上一步打印的地址（留空即 `127.0.0.1:7788`）以及 token。
+3. 之后的对话都在那台机器上运行；它们编辑的是那台机器上的这份文件夹，可用 git 或共享挂载保持同步。**serve** 打印的命令同样能让没装这个应用的机器起服务。
+
+那台机器需要这个可执行文件和已安装的 agent，其 `sshd` 需允许 TCP 转发（`AllowTcpForwarding yes`）。主机名留空则直接连接该地址，适合通过其他方式连到的服务器。
 
 ## 使用统计
 

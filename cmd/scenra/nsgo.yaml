@@ -1,6 +1,6 @@
 name: Scenra
 id: me.oneo.nsgo-scenra
-version: 0.1.1
+version: 0.2.0
 
 file_types:
   - name: Scenra File
@@ -15,7 +15,4 @@ build:
   targets: [macos_arm64, windows_x64, linux_x64]
 
 release:
-  github: oneo-me/nsgo-scenra
-
-updates:
-  key: fZ1TA1LDqgVzLIAf8+9AMfiJ1T8xaHa3YbtxCF2VySc=
+  github: zjlovezxy/nsgo-scenra

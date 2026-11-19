@@ -30,7 +30,7 @@ const (
 // homePage is the tab always first: the folders opened lately, each
 // opening in a tab of its own, or the settings, which its sidebar
 // chooses between.
-func homePage(cx *core.Scope, t *tabs, page *core.Signal[string], m *chatview.Model, n *namer) core.Node {
+func homePage(cx *core.Scope, t *tabs, page *core.Signal[string], m *chatview.Model, n *namer, s *session) core.Node {
 	tr := locales.For(cx)
 	colors := ui.ColorsOf(cx)
 	nav := ui.Sidebar{TestID: "home-sidebar", Selected: page.Get, OnSelect: page.Set, Sections: []ui.SidebarSection{{Items: []ui.SidebarItem{
@@ -44,7 +44,7 @@ func homePage(cx *core.Scope, t *tabs, page *core.Signal[string], m *chatview.Mo
 			},
 			Children: []core.Node{nav}},
 		core.Show{When: func() bool { return page.Get() == pageSettings },
-			Then: func(cx *core.Scope) core.Node { return settingsPage(cx, m, n) },
+			Then: func(cx *core.Scope) core.Node { return settingsPage(cx, m, n, s) },
 			Else: func(cx *core.Scope) core.Node { return recentPage(cx, t) }},
 	}}
 }

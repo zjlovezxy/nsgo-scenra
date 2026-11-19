@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-20
+
+- Add running a folder's agents on another machine over `ssh`: `scenra serve` serves the folder's agents with an address and a token, which **Settings** → **Agent machine** takes; the window only draws, and the assistant there reads the files instead of the view.
+- Keep each folder's agent and model for its new conversations, instead of one choice shared by every folder.
+- Build releases from this fork's GitHub Actions with the macOS arm64, Windows and Linux targets, without the update key upstream signs with, so these builds do not update themselves.
+
 ## [0.1.1] - 2026-11-18
 
 - Add a language setting choosing English, Simplified Chinese or the system's language, which applies at once and is kept for later starts.
