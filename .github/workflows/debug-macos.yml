@@ -1,0 +1,54 @@
+name: Debug macOS
+
+on:
+  push:
+    branches: [debug-macos]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Build the mac app
+        run: go tool nsgo build -target macos_arm64 -version 0.2.0-debug cmd/scenra
+      - name: Launch and probe
+        run: |
+          set -x
+          APP=$(find cmd/scenra/dist -name 'Scenra.app' -maxdepth 3 | head -1)
+          echo "APP=$APP"
+          BIN="$APP/Contents/MacOS/Scenra"
+          "$BIN" > /tmp/app.log 2>&1 &
+          sleep 20
+          echo "--- ps"
+          ps -eo pid,stat,etime,command | grep -i "[S]cenra"
+          echo "--- windows"
+          osascript -e 'tell application "System Events" to get name of every process' 2>&1 | tr ',' '\n' | grep -i scenra || true
+          osascript -e 'tell application "System Events" to tell process "Scenra" to get name of every window' 2>&1 || true
+          echo "--- screenshot"
+          screencapture -x /tmp/shot.png 2>&1 || true
+          ls -l /tmp/shot.png || true
+          echo "--- sample"
+          PID=$(pgrep -f 'MacOS/Scenra' | head -1)
+          echo "PID=$PID"
+          if [ -n "$PID" ]; then
+            sample "$PID" 3 -file /tmp/sample.txt >/dev/null 2>&1 || true
+            head -80 /tmp/sample.txt || true
+          fi
+          echo "--- app log"
+          cat /tmp/app.log || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: diag
+          path: |
+            /tmp/shot.png
+            /tmp/sample.txt
+            /tmp/app.log
+          if-no-files-found: warn
