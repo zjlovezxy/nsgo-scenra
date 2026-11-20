@@ -1,0 +1,138 @@
+## ps
+ 4173 S<     00:20 cmd/scenra/dist/Scenra-0.2.0-debug-macos_arm64/Scenra.app/Contents/MacOS/Scenra
+
+## frontmost processes
+ Scenra
+
+## windows
+Scenra
+
+## app log
+/private/tmp/shot.png
+  pixelWidth: 1024
+  pixelHeight: 768
+PID=4173
+## sample
+Analysis of sampling Scenra (pid 4173) every 1 millisecond
+Process:         Scenra [4173]
+Path:            /Users/USER/*/Scenra.app/Contents/MacOS/Scenra
+Load Address:    0x100a84000
+Identifier:      me.oneo.nsgo-scenra
+Version:         0.2.0-debug (0.2.0-debug)
+Code Type:       ARM64
+Platform:        macOS
+Parent Process:  bash [4166]
+Target Type:     live task
+
+Date/Time:       2026-11-20 08:54:05.640 +0000
+Launch Time:     2026-11-20 08:53:43.727 +0000
+OS Version:      macOS 26.7.2 (25G332)
+Report Version:  7
+Analysis Tool:   /usr/bin/sample
+
+Physical footprint:         29.9M
+Physical footprint (peak):  30.5M
+Idle exit:                  untracked
+----
+
+Call graph:
+    2185 Thread_16887   DispatchQueue_1: com.apple.main-thread  (serial)
+    + 2185 ???  (in <unknown binary>)  [0x4dd0f940000e]
+    +   2185 ???  (in <unknown binary>)  [0x10477cb10]
+    +     2185 ???  (in Scenra)  load address 0x100a84000 + 0x848ac  [0x100b088ac]
+    +       2185 ???  (in Scenra)  load address 0x100a84000 + 0x69c9b4  [0x1011209b4]
+    +         2185 -[NSApplication run]  (in AppKit) + 368  [0x184d2613c]
+    +           2185 -[NSApplication(NSEventRouting) nextEventMatchingMask:untilDate:inMode:dequeue:]  (in AppKit) + 72  [0x1858c8678]
+    +             2185 -[NSApplication(NSEventRouting) _nextEventMatchingEventMask:untilDate:inMode:dequeue:]  (in AppKit) + 688  [0x1858c896c]
+    +               2185 _DPSNextEvent  (in AppKit) + 576  [0x184d33084]
+    +                 2185 _DPSBlockUntilNextEventMatchingListInMode  (in AppKit) + 228  [0x1853df3d0]
+    +                   2185 _BlockUntilNextEventMatchingListInMode  (in HIToolbox) + 48  [0x18d87e14c]
+    +                     2185 ReceiveNextEventCommon  (in HIToolbox) + 488  [0x18d6f48bc]
+    +                       2185 RunCurrentEventLoopInMode  (in HIToolbox) + 320  [0x18d6f1560]
+    +                         2185 _CFRunLoopRunSpecificWithOptions  (in CoreFoundation) + 532  [0x1809c7508]
+    +                           2185 __CFRunLoopRun  (in CoreFoundation) + 1188  [0x1808f4a44]
+    +                             2185 __CFRunLoopServiceMachPort  (in CoreFoundation) + 160  [0x1808f6158]
+    +                               2185 mach_msg  (in libsystem_kernel.dylib) + 24  [0x1807f4fc0]
+    +                                 2185 mach_msg_overwrite  (in libsystem_kernel.dylib) + 480  [0x1807fd9c0]
+    +                                   2185 mach_msg2_internal  (in libsystem_kernel.dylib) + 76  [0x1808075a4]
+    +                                     2185 mach_msg2_trap  (in libsystem_kernel.dylib) + 8  [0x1807f4c34]
+    2185 Thread_16889
+    + 2185 ???  (in Scenra)  load address 0x100a84000 + 0x84904  [0x100b08904]
+    +   2184 ???  (in Scenra)  load address 0x100a84000 + 0x85a7c  [0x100b09a7c]
+    +   ! 2184 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1024  [0x180839154]
+    +   !   2184 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x1807f850c]
+    +   1 ???  (in Scenra)  load address 0x100a84000 + 0x856c4  [0x100b096c4]
+    +     1 usleep  (in libsystem_c.dylib) + 68  [0x1806d3bd8]
+    +       1 nanosleep  (in libsystem_c.dylib) + 220  [0x1806d3cc0]
+    +         1 __semwait_signal  (in libsystem_kernel.dylib) + 8  [0x1807f8308]
+    2185 Thread_16890
+    + 2185 ???  (in <unknown binary>)  [0xd65f03c0]
+    +   2185 ???  (in Scenra)  load address 0x100a84000 + 0x84904  [0x100b08904]
+    +     2185 ???  (in Scenra)  load address 0x100a84000 + 0x85a48  [0x100b09a48]
+    +       2185 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x180839128]
+    +         2185 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x1807f850c]
+    2185 Thread_16891
+    + 2185 ???  (in <unknown binary>)  [0xd65f03c0]
+    +   2185 ???  (in Scenra)  load address 0x100a84000 + 0x84904  [0x100b08904]
+    +     2185 ???  (in Scenra)  load address 0x100a84000 + 0x85a48  [0x100b09a48]
+    +       2185 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x180839128]
+    +         2185 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x1807f850c]
+    2185 Thread_16892
+    + 1171 ???  (in <unknown binary>)  [0xd65f03c0]
+    + ! 1171 ???  (in Scenra)  load address 0x100a84000 + 0x84904  [0x100b08904]
+    + !   1171 ???  (in Scenra)  load address 0x100a84000 + 0x85a48  [0x100b09a48]
+    + !     1171 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x180839128]
+    + !       1171 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x1807f850c]
+    + 1014 ???  (in Scenra)  load address 0x100a84000 + 0x85788  [0x100b09788]
+    +   1014 kevent  (in libsystem_kernel.dylib) + 8  [0x1807fafc4]
+    2185 Thread_16893
+    + 2185 ???  (in <unknown binary>)  [0xd65f03c0]
+    +   2185 ???  (in Scenra)  load address 0x100a84000 + 0x84904  [0x100b08904]
+    +     2185 ???  (in Scenra)  load address 0x100a84000 + 0x85a48  [0x100b09a48]
+    +       2185 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x180839128]
+    +         2185 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x1807f850c]
+    2185 Thread_16895
+    + 2185 start_wqthread  (in libsystem_pthread.dylib) + 8  [0x180833c10]
+    +   2185 _pthread_wqthread  (in libsystem_pthread.dylib) + 368  [0x180834f0c]
+    +     2185 __workq_kernreturn  (in libsystem_kernel.dylib) + 8  [0x1807f69f0]
+    2185 Thread_16945: com.apple.NSEventThread
+    + 2185 thread_start  (in libsystem_pthread.dylib) + 8  [0x180833c1c]
+    +   2185 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x180838c58]
+    +     2185 _NSEventThread  (in AppKit) + 184  [0x184e54cac]
+    +       2185 _CFRunLoopRunSpecificWithOptions  (in CoreFoundation) + 532  [0x1809c7508]
+    +         2185 __CFRunLoopRun  (in CoreFoundation) + 1188  [0x1808f4a44]
+    +           2185 __CFRunLoopServiceMachPort  (in CoreFoundation) + 160  [0x1808f6158]
+    +             2185 mach_msg  (in libsystem_kernel.dylib) + 24  [0x1807f4fc0]
+    +               2185 mach_msg_overwrite  (in libsystem_kernel.dylib) + 480  [0x1807fd9c0]
+    +                 2185 mach_msg2_internal  (in libsystem_kernel.dylib) + 76  [0x1808075a4]
+    +                   2185 mach_msg2_trap  (in libsystem_kernel.dylib) + 8  [0x1807f4c34]
+    2185 Thread_16973
+    + 2185 ???  (in <unknown binary>)  [0xd65f03c0]
+    +   2185 ???  (in Scenra)  load address 0x100a84000 + 0x84904  [0x100b08904]
+    +     2185 ???  (in Scenra)  load address 0x100a84000 + 0x85a48  [0x100b09a48]
+    +       2185 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x180839128]
+    +         2185 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x1807f850c]
+    2185 Thread_16974
+    + 1171 ???  (in Scenra)  load address 0x100a84000 + 0x85788  [0x100b09788]
+    + ! 1171 kevent  (in libsystem_kernel.dylib) + 8  [0x1807fafc4]
+    + 1014 ???  (in <unknown binary>)  [0xd65f03c0]
+    +   1014 ???  (in Scenra)  load address 0x100a84000 + 0x84904  [0x100b08904]
+    +     1014 ???  (in Scenra)  load address 0x100a84000 + 0x85a48  [0x100b09a48]
+    +       1014 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x180839128]
+    +         1014 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x1807f850c]
+    2185 Thread_16980
+    + 2185 ???  (in <unknown binary>)  [0xd65f03c0]
+    +   2185 ???  (in Scenra)  load address 0x100a84000 + 0x84904  [0x100b08904]
+    +     2185 ???  (in Scenra)  load address 0x100a84000 + 0x85a48  [0x100b09a48]
+    +       2185 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x180839128]
+    +         2185 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x1807f850c]
+    2185 Thread_16981
+    + 2185 ???  (in <unknown binary>)  [0xd65f03c0]
+    +   2185 ???  (in Scenra)  load address 0x100a84000 + 0x84904  [0x100b08904]
+    +     2185 ???  (in Scenra)  load address 0x100a84000 + 0x85a48  [0x100b09a48]
+    +       2185 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x180839128]
+    +         2185 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x1807f850c]
+    2185 Thread_16984
+## after quit
+gone
+29:33: execution error: Scenra got an error: User canceled. (-128)
