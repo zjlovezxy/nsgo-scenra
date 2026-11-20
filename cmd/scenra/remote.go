@@ -195,6 +195,7 @@ func (s *session) lost(cl *wire.Client) {
 func (s *session) enable() {
 	s.state.Set(stateConnecting)
 	s.problem.Set("")
+	s.rememberOn(true)
 	r := s.config()
 	go func() {
 		err := s.connect(r)
@@ -212,6 +213,7 @@ func (s *session) enable() {
 
 // disable runs the agents on this machine again.
 func (s *session) disable() {
+	s.rememberOn(false)
 	s.close()
 	// The window rebuilds once the event that turned it off is done.
 	s.cx.Post(func() {
@@ -223,6 +225,17 @@ func (s *session) disable() {
 
 // reconnect tries the machine the settings name again.
 func (s *session) reconnect() { s.enable() }
+
+// rememberOn keeps the switch's state, so the next start runs the agents
+// where this one did.
+func (s *session) rememberOn(on bool) {
+	st := s.cx.Storage()
+	if on {
+		st.SetItem(keyRemoteOn, "1")
+		return
+	}
+	st.SetItem(keyRemoteOn, "0")
+}
 
 // close ends the connection to the other machine, whose ssh ends with it.
 func (s *session) close() {
@@ -367,6 +380,7 @@ func remoteSection(cx *core.Scope, s *session) core.Node {
 					s.disable()
 				}
 			}},
+			core.Text{Content: tr.RemoteOn(), Style: core.Style{FontSize: 13, FlexShrink: 1}, StyleFunc: ui.Colored(colors.Text)},
 			ui.Spacer{},
 			core.Show{When: func() bool { return s.state.Get() != stateLocal && s.state.Get() != stateConnecting },
 				Then: func(*core.Scope) core.Node {

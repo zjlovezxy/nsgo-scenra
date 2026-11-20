@@ -1,6 +1,6 @@
 name: Scenra
 id: me.oneo.nsgo-scenra
-version: 0.2.0
+version: 0.2.1
 
 file_types:
   - name: Scenra File

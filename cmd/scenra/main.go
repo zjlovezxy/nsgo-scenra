@@ -50,10 +50,15 @@ func Root(cx *core.Scope) core.Node {
 	home, _ := os.UserHomeDir()
 	sess := newSession(cx)
 	cx.Cleanup(sess.close)
-	return core.Dynamic(func(cx *core.Scope) core.Node {
-		sess.rev.Get()
-		return root(cx, host.Options{Dir: home}, sess)
-	})
+	// The window's own child has to be a laid-out node: a region returned
+	// straight to the window draws nothing, so the window fills with a view
+	// that holds it.
+	return core.View{Style: core.Style{FlexGrow: 1}, Children: []core.Node{
+		core.Dynamic(func(cx *core.Scope) core.Node {
+			sess.rev.Get()
+			return root(cx, host.Options{Dir: home}, sess)
+		}),
+	}}
 }
 
 // root is Root with the agents agents runs and the machine sess says they

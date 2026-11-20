@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-20
+
+- Fix a window that drew nothing when the agents' machine changed: the window's content is now a laid-out view rather than the region itself.
+- Keep **Settings** → **Agent machine**'s switch for the next start, and say on screen what turning it on does.
+
 ## [0.2.0] - 2026-11-20
 
 - Add running a folder's agents on another machine over `ssh`: `scenra serve` serves the folder's agents with an address and a token, which **Settings** → **Agent machine** takes; the window only draws, and the assistant there reads the files instead of the view.
